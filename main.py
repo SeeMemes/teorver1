@@ -30,18 +30,30 @@ def standard_deviation(mass):
 
 def empirical_mass(prev):
     new_mass = []
-    for i in range(len(prev)):
-        k = 0
-        for j in range(len(prev)):
-            if (prev[i] == prev[j]):
-                k += 1
-        new_mass.append(k / len(prev))
-        i += k
+    sum = 0
+    print('\tif x < ' + str(prev[0]) + ' then ' + ' f(x) = ' + str(sum))
+    k = 1
+    for i in range(len(prev) - 1):
+        if (prev[i] == prev[i - 1]):
+            k += 1
+            continue
+        else:
+            new_mass.append(k / len(prev))
+            sum += k / len(prev)
+            k = 1
+            print('\tif ' + str(prev[i]) + ' < x < ' + str(prev[i + 1]) + ' then f(x) = ' + str(round(sum*100)/100))
+    new_mass.append(k / len(prev))
+    sum += k / len(prev)
+    print('\tif x > ' + str(prev[len(prev)-1]) + ' then ' + ' f(x) = ' + str(round(sum*100)/100))
+
     return new_mass
 
+def remove_dupes(prev):
+    prev = list(dict.fromkeys(prev))
+    return prev
 
 def plot_empirical_cdf(sample):
-    plt.hist(sample, histtype='step', cumulative=True, bins=len(sample)*10)
+    plt.hist(sample, histtype='step', cumulative=True, bins=len(sample) * 10)
     plt.title('График эмперической функции распределения')
     plt.show()
 
@@ -61,12 +73,14 @@ print('\tРазмах: ' + str(mass[19] - mass[0]))
 cprint('Мат. ожидание и среднеквадрат. отклонение: ', 'green')
 print('\tМатематическое ожидание: ' + str(exp_value(mass)) + '\n\tСреднеквадратическое отклонение: ' \
       + str(standard_deviation(mass)))
+cprint('Эмперическая функция распределения: ', 'green')
 e_mass = empirical_mass(mass)
 plot_empirical_cdf(mass)
-plt.plot(mass, e_mass)
+nodupe = remove_dupes(mass)
+plt.plot(e_mass)
 plt.title('Полигон частот групированной выборки')
 plt.show()
-plt.bar(mass, width=0.2, height=e_mass)
-st.gaussian_kde(mass)
+plt.bar(nodupe, width=0.2, height=e_mass)
+st.gaussian_kde(nodupe)
 plt.title('Гистограмма частот групированной выборки')
 plt.show()
