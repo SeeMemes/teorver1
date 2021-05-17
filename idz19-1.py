@@ -110,7 +110,8 @@ mass.sort()
 cprint('a) Вариационный ряд: ', 'green')
 print('\t' + str(mass))
 
-cprint('б) Экстремумы и размах: ', 'green')
+cprint('\nб) Экстремумы и размах: ', 'green')
+b_table = []
 w = mass[len(mass) - 1] - mass[0]
 print('\tРазмах: ' + str(w))
 h = w / 9
@@ -127,14 +128,13 @@ for i in range(9):
             k += 1
         else:
             break
-    print("\t" + str(i + 1) + ". " + str(a) + " - " + str(mass[j + k]) + \
-          " | " + str(a + (mass[j + k] - a) / 2) + " | " + str(k) + " | " + str(k / len(mass)) + \
-          " | " + str((k / len(mass)) / h))
+    b_table.append([i + 1, a, mass[j + k], a + (mass[j + k] - a) / 2, k, k / len(mass), (k / len(mass)) / h])
     mass_F.append(k / len(mass))
     mass_x.append(a + (mass[j + k] - a) / 2)
     left.append(a)
     right.append(mass[j + k])
     j += k
+cprint(tabulate(b_table, tablefmt="fancy_grid", floatfmt="2.4f"))
 
 mass_emp = []
 mass_emp.append(0)
@@ -153,21 +153,48 @@ plt.plot(mass_x, mass_emp)
 plt.title('в.3) График эмперической функции')
 plt.show()
 
-cprint('г) Выборочное среднее и выборочная дисперсия: ', 'green')
-
+cprint('\nг) Выборочное среднее и выборочная дисперсия: ', 'green')
 k = 0
+g_table = []
 for i in range(9):
     ni = mass_F[i] * 100
-    print("\t" + str(i + 1) + ". " + str(left[i]) + " - " + str(right[i]) + \
-          " | " + str(mass_x[i]) + " | " + str(round(ni)) + " | " + str(round(ni * mass_x[i] * 100) / 100) + \
-          " | " + str(mass_x[i] ** 2) + " | " + str(round(ni * mass_x[i] ** 2 * 100) / 100))
+    # print("\t" + str(i + 1) + ". " + str(left[i]) + " - " + str(right[i]) + \
+    #      " | " + str(mass_x[i]) + " | " + str(round(ni)) + " | " + str(round(ni * mass_x[i] * 100) / 100) + \
+    #      " | " + str(mass_x[i] ** 2) + " | " + str(round(ni * mass_x[i] ** 2 * 100) / 100))
+    g_table.append([i + 1, left[i], right[i], mass_x[i], ni, ni * mass_x[i], mass_x[i] ** 2, ni * mass_x[i] ** 2])
     k += ni * mass_x[i]
-
+cprint(tabulate(g_table, tablefmt="fancy_grid", floatfmt="2.4f"))
 mid = k / 100
 print('\n\tВыборочное среднее: ' + str(mid))
 k = 0
 for i in range(9):
     ni = mass_F[i] * 100
-    k += (mass_x[i] - mid) ** 2 * ni
+    k += ((mass_x[i] / 2) ** 2) * ni
 db = round((k / 100 - mid ** 2) * 100) / 100
+ob = db ** (1 / 2)
 print('\tВыборочная дисперсия: ' + str(db))
+
+cprint('\nд) Проверка критерием пирсона: ', 'green')
+j = 0
+a = []
+d_table = []
+for i in range(9):
+    a = mass[j]
+    k = 0
+    while mass[j + k] <= a + h or k < 5:
+        if (j + k <= 98):
+            k += 1
+        else:
+            break
+    if (i > 0):
+        d_table.append([i + 1, a, mass[j + k], a - d_table[i - 1][2], a - d_table[i - 1][2] / ob])
+    else:
+        d_table.append([i + 1, a, mass[j + k], 0.0, 0.0])
+    j += k
+if (d_table[8][4] < 5):
+    d_table[7][2] = d_table[8][2]
+    d_table[7][3] = d_table[8][3]
+    d_table[7][4] = d_table[7][3] - d_table[7][2]
+    d_table[7][5] = d_table[7][4] / ob
+    d_table.pop(8)
+cprint(tabulate(d_table, tablefmt="fancy_grid", floatfmt="2.4f"))
