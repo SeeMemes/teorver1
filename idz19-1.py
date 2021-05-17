@@ -128,10 +128,10 @@ for i in range(9):
         else:
             break
     print("\t" + str(i + 1) + ". " + str(a) + " - " + str(mass[j + k]) + \
-          " | " + str(a + (h / 2)) + " | " + str(k) + " | " + str(k / len(mass)) + \
+          " | " + str(a + (mass[j + k] - a) / 2) + " | " + str(k) + " | " + str(k / len(mass)) + \
           " | " + str((k / len(mass)) / h))
     mass_F.append(k / len(mass))
-    mass_x.append(a + (h / 2))
+    mass_x.append(a + (mass[j + k] - a) / 2)
     left.append(a)
     right.append(mass[j + k])
     j += k
@@ -156,12 +156,18 @@ plt.show()
 cprint('г) Выборочное среднее и выборочная дисперсия: ', 'green')
 
 k = 0
-for i in range(len(mass)):
-    k += (mass[i])
-mid = k / len(mass)
-print('\tВыборочное среднее: ' + str(mid))
+for i in range(9):
+    ni = mass_F[i] * 100
+    print("\t" + str(i + 1) + ". " + str(left[i]) + " - " + str(right[i]) + \
+          " | " + str(mass_x[i]) + " | " + str(round(ni)) + " | " + str(round(ni * mass_x[i] * 100) / 100) + \
+          " | " + str(mass_x[i] ** 2) + " | " + str(round(ni * mass_x[i] ** 2 * 100) / 100))
+    k += ni * mass_x[i]
+
+mid = k / 100
+print('\n\tВыборочное среднее: ' + str(mid))
 k = 0
-for i in range(len(mass)):
-    k += pow(mass[i] - mid, 2)
-db = k / len(mass) - mid ** 2
-print()
+for i in range(9):
+    ni = mass_F[i] * 100
+    k += (mass_x[i] - mid) ** 2 * ni
+db = round((k / 100 - mid ** 2) * 100) / 100
+print('\tВыборочная дисперсия: ' + str(db))
